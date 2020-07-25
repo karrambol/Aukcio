@@ -1,0 +1,1 @@
+{"processes":{"a72ba92a-5ec6-41c1-aa25-5c0e90b46a68":{"parent":"f42d3e9b-4616-47f4-a580-87d64322702c","children":[]},"f42d3e9b-4616-47f4-a580-87d64322702c":{"parent":null,"children":["a72ba92a-5ec6-41c1-aa25-5c0e90b46a68"]}},"files":{"D:\\Николай\\Auk-vue\\frontend\\dist\\js\\main.js":["a72ba92a-5ec6-41c1-aa25-5c0e90b46a68"]},"externalIds":{}}
