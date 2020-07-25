@@ -14,7 +14,11 @@ module.exports = {
   },
   rules: {
     'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
-    'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off'
+    'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
+    semi: 'off',
+    '@typescript-eslint/semi': ['error'],
+    '@typescript-eslint/no-empty-function': ['warn'],
+    '@typescript-eslint/no-array-constructor': ['warn']
   },
   overrides: [
     {
@@ -27,4 +31,4 @@ module.exports = {
       }
     }
   ]
-}
+};

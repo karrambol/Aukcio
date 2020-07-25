@@ -31,131 +31,133 @@
     </div>
   </div>
 </template>
-<script>
-export default {
-  name: 'Timer',
-  data () {
-    return {
-      isGoing: false,
-      duration: 10 * 60000,
-      currentTime: 10 * 60000,
-      elapsed: 0,
-      wasted: 0,
-      aukStart: window.performance.now(),
-      frame: 0,
-      tick: 62,
-      timeoutID: 0
-    }
-  },
+<script lang="ts">
+import { Component, Vue } from 'vue-property-decorator';
+
+@Component
+class Timer extends Vue {
+  isGoing = false;
+  duration = 10 * 60000;
+  currentTime = 10 * 60000;
+  elapsed = 0;
+  wasted = 0;
+  aukStart = window.performance.now();
+  frame = 0;
+  tickValue = 62;
+  timeoutID = 0;
+  lastTime = 0;
+
   created () {
-    const _this = this // eslint-disable-line @typescript-eslint/no-this-alias
-    this.aukStart = window.performance.now()
-    function timeWasted () {
-      return window.performance.now() - _this.aukStart
+    this.aukStart = window.performance.now();
+    this.wastedCount();
+  }
+
+  timeWasted () {
+    return window.performance.now() - this.aukStart;
+  }
+
+  wastedCount () {
+    this.frame = window.requestAnimationFrame(this.wastedCount);
+    this.wasted = this.timeWasted();
+  }
+
+  get bank (): number {
+    return this.$store.getters.bank;
+  }
+
+  get wastedTimeString (): string {
+    return `${String(Math.floor(this.wasted / 3600000)).padStart(
+      2,
+      '0'
+    )}:${String(Math.floor((this.wasted % 3600000) / 60000)).padStart(
+      2,
+      '0'
+    )}:${String(Math.floor((this.wasted % 60000) / 1000)).padStart(2, '0')}`;
+  }
+
+  get minutes (): string {
+    return String(Math.floor(this.currentTime / 60000)).padStart(2, '0');
+  }
+
+  get seconds (): string {
+    return String(Math.floor((this.currentTime % 60000) / 1000)).padStart(
+      2,
+      '0'
+    );
+  }
+
+  get milliseconds (): string {
+    return String(Math.floor(this.currentTime % 1000)).padStart(3, '0');
+  }
+
+  start () {
+    if (this.currentTime > 0) {
+      this.isGoing = true;
+      this.lastTime = window.performance.now();
+      this.tick();
     }
-    function wastedCount () {
-      _this.frame = window.requestAnimationFrame(wastedCount)
-      _this.wasted = timeWasted()
+  }
+
+  tick () {
+    if (this.isGoing) {
+      const time = window.performance.now();
+      this.elapsed += Math.min(
+        time - this.lastTime,
+        this.duration - this.elapsed
+      );
+      this.lastTime = time;
+      this.timeoutID = setTimeout(this.tick, this.tickValue);
+      this.currentTime = this.duration - this.elapsed;
+      if (this.currentTime <= 0) {
+        this.stop();
+      }
+    } else {
+      this.stop();
     }
-    wastedCount()
-  },
-  computed: {
-    bank: {
-      get () {
-        return this.$store.getters.bank
-      }
-    },
-    wastedTimeString: {
-      get () {
-        return `${String(Math.floor(this.wasted / 3600000)).padStart(
-          2,
-          '0'
-        )}:${String(Math.floor((this.wasted % 3600000) / 60000)).padStart(
-          2,
-          '0'
-        )}:${String(Math.floor((this.wasted % 60000) / 1000)).padStart(2, '0')}`
-      }
-    },
-    minutes: {
-      get () {
-        return String(Math.floor(this.currentTime / 60000)).padStart(2, '0')
-      }
-    },
-    seconds: {
-      get () {
-        return String(Math.floor((this.currentTime % 60000) / 1000)).padStart(
-          2,
-          '0'
-        )
-      }
-    },
-    milliseconds: {
-      get () {
-        return String(Math.floor(this.currentTime % 1000)).padStart(3, '0')
-      }
-    }
-  },
-  methods: {
-    start: function () {
-      if (this.currentTime > 0) {
-        let lastTime = window.performance.now()
-        const _this = this // eslint-disable-line @typescript-eslint/no-this-alias
-        this.isGoing = true
-        ;(function update () {
-          if (_this.isGoing) {
-            const time = window.performance.now()
-            _this.elapsed += Math.min(
-              time - lastTime,
-              _this.duration - _this.elapsed
-            )
-            lastTime = time
-            _this.timeoutID = setTimeout(update, _this.tick)
-            _this.currentTime = _this.duration - _this.elapsed
-            if (_this.currentTime <= 0) {
-              _this.stop()
-            }
-          } else {
-            _this.stop()
-          }
-        })()
-      }
-    },
-    stop () {
-      clearTimeout(this.timeoutID)
-      this.timeoutID = undefined
-      this.isGoing = false
-    },
-    clear () {
-      this.stop()
-      this.duration = 0
-      this.elapsed = 0
-      this.currentTime = 0
-    },
-    addSmall () {
-      this.duration += 1000 * 60
-      this.currentTime = this.duration - this.elapsed
-    },
-    addBig () {
-      this.duration += 2000 * 60
-      this.currentTime = this.duration - this.elapsed
-    },
-    setEven () {
-      this.elapsed = 0
-      this.duration = 10000 * 60
-      this.currentTime = this.duration - this.elapsed
-    },
-    subSmall () {
-      const newDuration = this.duration - 1000 * 60
-      const newCurrentTime = newDuration - this.elapsed
-      if ((newDuration > 0) & (newCurrentTime > 0)) {
-        this.duration = newDuration
-        this.currentTime = newCurrentTime
-      } else {
-        this.clear()
-      }
+  }
+
+  stop () {
+    clearTimeout(this.timeoutID);
+    this.timeoutID = 0;
+    this.isGoing = false;
+  }
+
+  clear () {
+    this.stop();
+    this.duration = 0;
+    this.elapsed = 0;
+    this.currentTime = 0;
+  }
+
+  addSmall () {
+    this.duration += 1000 * 60;
+    this.currentTime = this.duration - this.elapsed;
+  }
+
+  addBig () {
+    this.duration += 2000 * 60;
+    this.currentTime = this.duration - this.elapsed;
+  }
+
+  setEven () {
+    this.elapsed = 0;
+    this.duration = 10000 * 60;
+    this.currentTime = this.duration - this.elapsed;
+  }
+
+  subSmall () {
+    const newDuration = this.duration - 1000 * 60;
+    const newCurrentTime = newDuration - this.elapsed;
+    if (newDuration > 0 && newCurrentTime > 0) {
+      this.duration = newDuration;
+      this.currentTime = newCurrentTime;
+    } else {
+      this.clear();
     }
   }
 }
+
+export default Timer;
 </script>
 
 <style scoped>

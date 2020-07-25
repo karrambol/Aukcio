@@ -1,114 +1,129 @@
 <template>
-  <div class="background-flame flame invisible-flame" id="background-flame">
-    <div class="background-flame-inner flame" id="background-flame-inner">
-      <div class="background-flame-inner2 flame" id="background-flame-inner2">
-        <div class="background-flame-inner3 flame" id="background-flame-inner3"></div>
+  <div
+    class="background-flame flame"
+    id="background-flame"
+    v-bind:class="classObject"
+    :style="{ backgroundPositionY: `${this.pos}vh` }"
+  >
+    <div
+      class="background-flame-inner flame"
+      id="background-flame-inner"
+      v-bind:class="classObject"
+      :style="{ backgroundPositionY: `${this.pos + 24}vh` }"
+    >
+      <div
+        class="background-flame-inner2 flame"
+        id="background-flame-inner2"
+        v-bind:class="classObject"
+        :style="{ backgroundPositionY: `${this.pos + 48}vh` }"
+      >
+        <div
+          class="background-flame-inner3 flame"
+          id="background-flame-inner3"
+          v-bind:class="classObject"
+          :style="{ backgroundPositionY: `${this.pos + 72}vh` }"
+        ></div>
       </div>
     </div>
   </div>
 </template>
 
-<script>
-export default {
-  name: 'Flame',
+<script lang="ts">
+import { Component, Vue } from 'vue-property-decorator';
+import { BankHistoryUnit } from '../types';
+
+@Component
+class Flame extends Vue {
+  cashFlowInterval = 0;
+  flameTime = 60000;
+  currentFlameIntense = 0;
+  flameInvisTimers: number[] = [];
+  fast = false;
+  invisibleFlame = true;
+  x = 12;
+
+  get classObject (): { fast: boolean; 'invisible-flame': boolean } {
+    return { fast: this.fast, 'invisible-flame': this.invisibleFlame };
+  }
+
+  get pos (): number {
+    let intense = 1 * this.currentFlameIntense;
+    if (intense <= 10) {
+      intense = 0;
+      this.flameInvisTimers.push(
+        setTimeout(() => {
+          this.invisibleFlame = true;
+        }, 5500)
+      );
+    } else {
+      this.flameInvisTimers.forEach(el => clearTimeout(el));
+      this.flameInvisTimers = [];
+      this.invisibleFlame = false;
+      if (intense <= 30) {
+        intense = intense * 2 + 10;
+      } else {
+        intense = (intense * 4) / 7 + 70 - 17;
+      }
+    }
+    if (intense > 100) {
+      intense = 100;
+    }
+    const pos = 90 - 90 * (intense / 100);
+    return pos;
+  }
+
+  get bankHistory (): BankHistoryUnit[] {
+    return this.$store.getters.bankHistory;
+  }
+
+  get bank (): number {
+    return this.$store.getters.bank;
+  }
+
+  get maxPrice (): number {
+    return this.$store.getters.maxPrice;
+  }
+
+  get bankAgo (): number {
+    const filteredArray = this.bankHistory.filter(
+      (el: BankHistoryUnit, i: number) =>
+        el.date <= new Date(new Date().getTime() - this.flameTime) || i === 0
+    );
+    return filteredArray[filteredArray.length - 1].bank;
+  }
+
   created () {
-    setInterval(this.cashFlow, 500)
-  },
+    setInterval(this.cashFlow, 100);
+  }
+
   beforeDestroy () {
-    clearInterval(this.cashFlowInterval)
-    this.flameInvisTimers.forEach(el => clearTimeout(el))
-  },
-  data () {
-    return {
-      cashFlowInterval: null,
-      flameTime: 60000,
-      currentFlameIntense: 0,
-      flameInvisTimers: []
+    clearInterval(this.cashFlowInterval);
+    this.flameInvisTimers.forEach(el => clearTimeout(el));
+  }
+
+  intenseHandler (intanse: number) {
+    if (this.currentFlameIntense - intanse <= 0) {
+      this.fast = true;
+    } else {
+      this.fast = false;
     }
-  },
-  computed: {
-    bankHistory: {
-      get () {
-        return this.$store.getters.bankHistory
+    this.currentFlameIntense = intanse;
+  }
+
+  cashFlow () {
+    const delta2 =
+      this.bankHistory[this.bankHistory.length - 1].bank - this.bankAgo;
+    if (this.maxPrice >= 10000) {
+      if (this.currentFlameIntense !== 100) this.intenseHandler(100);
+    } else {
+      const derivative = delta2 / 60;
+      if (this.currentFlameIntense !== (100 * derivative) / 150) {
+        this.intenseHandler((100 * derivative) / 150);
       }
-    },
-    bank: {
-      get () {
-        return this.$store.getters.bank
-      }
-    },
-    maxPrice: {
-      get () {
-        return this.$store.getters.maxPrice
-      }
-    }
-  },
-  methods: {
-    bankAgo () {
-      const filteredArray = this.bankHistory.filter(
-        (el, i, arr) => el.date <= new Date(new Date().getTime() - this.flameTime) || i === 0
-      )
-      return filteredArray[filteredArray.length - 1].bank
-    },
-    cashFlow () {
-      const delta2 = this.bankHistory[this.bankHistory.length - 1].bank - this.bankAgo()
-      if (this.maxPrice >= 10000) {
-        if (this.currentFlameIntense !== 100) this.flameIntense(100)
-      } else {
-        const derivative = delta2 / 60
-        if (this.currentFlameIntense !== (100 * derivative) / 150) {
-          this.flameIntense((100 * derivative) / 150)
-        }
-      }
-    },
-    flameIntense (intense) {
-      if (this.currentFlameIntense - intense <= 0) {
-        document.getElementById('background-flame').classList.add('fast')
-        document.getElementById('background-flame-inner').classList.add('fast')
-        document.getElementById('background-flame-inner2').classList.add('fast')
-        document.getElementById('background-flame-inner3').classList.add('fast')
-      } else {
-        document.getElementById('background-flame').classList.remove('fast')
-        document.getElementById('background-flame-inner').classList.remove('fast')
-        document.getElementById('background-flame-inner2').classList.remove('fast')
-        document.getElementById('background-flame-inner3').classList.remove('fast')
-      }
-      this.currentFlameIntense = intense
-      if (intense <= 10) {
-        intense = 0
-        this.flameInvisTimers.push(
-          setTimeout(() => {
-            document.getElementById('background-flame').classList.add('invisible-flame')
-          }, 5500)
-        )
-      } else {
-        this.flameInvisTimers.forEach(el => clearTimeout(el))
-        document.getElementById('background-flame').classList.remove('invisible-flame')
-        this.flameInvisTimers = []
-        if (intense <= 30) {
-          intense = intense * 2 + 10
-        } else {
-          intense = (intense * 4) / 7 + 70 - 17
-        }
-      }
-      if (intense < 0) {
-        intense = 0
-      }
-      if (intense > 100) {
-        intense = 100
-      }
-      const pos = 90 - 90 * (intense / 100)
-      const x = 12
-      document.getElementById('background-flame').style = 'background-position-y: ' + pos + 'vh'
-      document.getElementById('background-flame-inner').style =
-        'background-position-y: ' + (pos + 2 * x) + 'vh'
-      document.getElementById('background-flame-inner2').style =
-        'background-position-y: ' + (pos + 4 * x) + 'vh'
-      document.getElementById('background-flame-inner3').style =
-        'background-position-y: ' + (pos + 6 * x) + 'vh'
     }
   }
 }
+export default Flame;
 </script>
 <style language="scss" scoped>
 .fast {

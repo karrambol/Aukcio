@@ -36,23 +36,25 @@
           class="lot-title"
           type="text"
           :value="row.title"
-          @input="setTitle(index, $event)"
+          @input="setTitle(index, $event.target.value)"
         />
         <input
           class="lot-price"
           type="text"
           :value="row.p"
-          @input="setP(index, $event)"
-          @change="pChangeHandler(index, 'p', $event)"
+          @input="setP(index, $event.target.value)"
+          @change="pChangeHandler(index, $event.target.value)"
         />
         <input
           class="lot-add"
           type="text"
           :value="row.add"
-          @input="setAdd(index, $event)"
-          @change="addChangeHandler(index, 'add', $event)"
+          @input="setAdd(index, $event.target.value)"
+          @change="addChangeHandler(index, $event.target.value)"
         />
-        <button class="add-button" @click="add(index, $event)">+</button>
+        <button class="add-button" @click="add(index, $event)">
+          +
+        </button>
       </div>
     </transition-group>
     <div class="add-row-button-container">
@@ -60,115 +62,101 @@
     </div>
   </div>
 </template>
-<script>
-import Velocity from 'velocity-animate'
-export default {
-  name: 'AukTable',
-  data () {
-    return {}
-  },
-  computed: {
-    tableData: {
-      get () {
-        return this.$store.getters.tableData
-      }
-    },
-    armageddonPrice: {
-      get () {
-        return this.$store.getters.armageddonPrice
-      }
-    },
-    communismPrice: {
-      get () {
-        return this.$store.getters.communismPrice
-      }
-    },
-    activeLots: {
-      get () {
-        return this.$store.getters.activeLots
-      }
+<script lang="ts">
+import { Component, Vue } from 'vue-property-decorator';
+import { Lot } from '@/types';
+
+@Component
+class AukTable extends Vue {
+  get tableData (): Lot[] {
+    return this.$store.getters.tableData;
+  }
+
+  get armageddonPrice (): number {
+    return this.$store.getters.armageddonPrice;
+  }
+
+  get communismPrice (): number {
+    return this.$store.getters.communismPrice;
+  }
+
+  get activeLots (): number {
+    return this.$store.getters.activeLots;
+  }
+
+  push () {
+    this.$store.commit('push', {});
+  }
+
+  setTitle (id: number, value: string) {
+    this.$store.commit('setTitle', { id: id, value: value });
+  }
+
+  setP (id: number, value: string) {
+    this.$store.dispatch('setP', { id: id, value: value });
+  }
+
+  setAdd (id: number, value: string) {
+    this.$store.commit('setAdd', { id: id, value: value });
+  }
+
+  sort () {
+    this.$store.dispatch('sort', {});
+  }
+
+  pChangeHandler (id: number, value: string) {
+    value = value.replace(/,/gi, '.');
+    this.$store.dispatch('setP', { id: id, value: value });
+    this.$store.dispatch('sort', {});
+    this.$store.dispatch('updateBankHistory', {});
+  }
+
+  addChangeHandler (id: number, value: string) {
+    value = value.replace(/,/gi, '.');
+    const newString = parseFloat(value);
+    value = isNaN(newString) ? value + '' : newString + '';
+    this.$store.commit('setAdd', { id: id, value: value });
+  }
+
+  add (id: number) {
+    if (this.$store.getters.is666(id)) {
+      console.log('666');
+      this.$emit('bloody', '');
     }
-  },
-  methods: {
-    push () {
-      this.$store.dispatch('push', {})
-    },
-    setTitle (id, e) {
-      this.$store.commit('setTitle', { id: id, value: e.target.value })
-    },
-    setP (id, e) {
-      this.$store.commit('setP', { id: id, value: e.target.value })
-    },
-    setAdd (id, e) {
-      this.$store.commit('setAdd', { id: id, value: e.target.value })
-    },
-    sort () {
-      this.$store.dispatch('sort', {})
-    },
-    pChangeHandler (id, field, e) {
-      e.target.value = e.target.value.replace(/,/gi, '.')
-      const newString = parseFloat(e.target.value)
-      e.target.value = isNaN(newString) ? e.target.value : newString
-      this.$store.commit('setP', { id: id, value: e.target.value })
-      this.$store.dispatch('sort', {})
-      this.$store.dispatch('updateBankHistory', {})
-    },
-    addChangeHandler (id, field, e) {
-      e.target.value = e.target.value.replace(/,/gi, '.')
-      const newString = parseFloat(e.target.value)
-      e.target.value = isNaN(newString) ? e.target.value : newString
-      this.$store.commit('setAdd', { id: id, value: e.target.value })
-    },
-    add (id) {
-      if (this.$store.getters.is666(id)) {
-        console.log('666')
-        this.$emit('bloody', '')
-      }
-      this.$store.dispatch('add', id)
-    },
-    beforeEnter (el, done) {
-      Velocity(el, { translateX: '1500px' }, { duration: 6000 })
-    },
-    enter (el, done) {
-      Velocity(el, { translateX: '-1500px' }, { duration: 6000 })
-    },
-    undo () {
-      this.$store.dispatch('undo', {})
-    },
-    redo () {
-      this.$store.dispatch('redo', {})
-    },
-    armageddon () {
-      const elements = document.getElementsByClassName('lot-price')
-      for (let i = 0; i < elements.length; i++) {
-        elements[i].classList.add('damaged-price')
-        setTimeout(() => elements[i].classList.remove('damaged-price'), 200)
-      }
-      this.$store.dispatch('armageddon', {})
-    },
-    communism () {
-      const elements = document.getElementsByClassName('lot-price')
-      for (let i = 0; i < elements.length; i++) {
-        elements[i].classList.add('communised-price')
-        setTimeout(() => elements[i].classList.remove('communised-price'), 200)
-      }
-      this.$store.dispatch('communism', {})
+    this.$store.dispatch('add', id);
+  }
+
+  undo () {
+    this.$store.commit('undo', {});
+  }
+
+  redo () {
+    this.$store.commit('redo', {});
+  }
+
+  armageddon () {
+    const elements = document.getElementsByClassName('lot-price');
+    for (let i = 0; i < elements.length; i++) {
+      elements[i].classList.add('damaged-price');
+      setTimeout(() => elements[i].classList.remove('damaged-price'), 200);
     }
+    this.$store.dispatch('armageddon', {});
+  }
+
+  communism () {
+    const elements = document.getElementsByClassName('lot-price');
+    for (let i = 0; i < elements.length; i++) {
+      elements[i].classList.add('communised-price');
+      setTimeout(() => elements[i].classList.remove('communised-price'), 200);
+    }
+    this.$store.dispatch('communism', {});
   }
 }
+
+export default AukTable;
 </script>
 
 <style scoped>
-.damaged-price {
-  background-color: rgb(168, 66, 168) !important;
-  border-color: rgb(168, 66, 168) !important;
-  box-shadow: 0 0 20px red !important;
-}
-.communised-price {
-  background-color: red !important;
-  border-color: red !important;
-  box-shadow: 0 0 20px red !important;
-}
 .top-controls-container {
   display: flex;
   flex-wrap: nowrap;
@@ -205,63 +193,32 @@ export default {
 p {
   margin-block-start: 0;
   margin-block-end: 0;
+  overflow-x: visable;
 }
 .list-enter-active,
 .list-leave-active {
-  transition: all 0.5s;
+  transition: all 0.2s;
 }
 .list-enter,
 .list-leave-to {
   transform: translateX(-1500px);
 }
+.bounce {
+  display: block;
+}
 .left-col {
-  /* background-color: #C9FFE9; */
   flex-grow: 1;
   flex-shrink: 1;
-  /* height: calc(100% - 70px); */
-  max-height: 100% !important;
-  /* width: 100%;
-    height: 100%; */
-  /* max-height: calc(100vh - 70px); */
+  max-height: 100%;
   padding-top: 4px;
-  overflow-y: auto !important;
+  overflow-y: auto;
   z-index: 100;
 }
-/* .left-col:hover{
-    overflow-y: auto;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    -moz-overflow-scrolling: touch;
-    -ms-overflow-scrolling: touch;
-    -o-overflow-scrolling: touch;
-    overflow-scrolling: touch;
-    margin-right: 0px;
-  }
-    .left-col::-webkit-scrollbar-track {
-      -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
-      background-color: #F5F5F5;
-    }
-    .left-col::-webkit-scrollbar{
-      width: 6px;
-      background-color: #F5F5F5;
-    }
-    .left-col::-webkit-scrollbar-thumb {
-      background-color: #000000;
-    }
-  .left-col::-webkit-scrollbar {
-    -webkit-appearance: none;
-    width: 7px;
-  }
-  .left-col::-webkit-scrollbar-thumb {
-    border-radius: 2px;
-    background-color: rgba(0,0,0,0.5);
-    -webkit-box-shadow: 0 0 1px rgba(255,255,255,0.5);
-  } */
 .lot-row {
   display: flex;
   flex-wrap: nowrap;
   padding: 8px;
-  /* line-height: 1; */
+  overflow-x: visable;
 }
 .lot-title {
   flex-grow: 5;
@@ -279,8 +236,6 @@ p {
   flex-shrink: 0;
 }
 input {
-  /* box-shadow: 3px 3px 0 #000; */
-  /* line-height: 1; */
   height: 100%;
   background-color: #d8d8d8;
   border: 3px solid #343a40;
@@ -293,10 +248,8 @@ input {
   margin-right: 15px;
 }
 input:focus {
-  /* background-color: white; */
   border: 3px solid #448aff;
   background-color: white;
-  /* box-shadow: 0 0 25px #bdbdbd, 3px 3px 0 #000; */
 }
 .lot-table :nth-child(1) input {
   background-color: gold;
@@ -325,19 +278,16 @@ button {
   font-size: 32px;
   font-weight: bold;
   line-height: 1;
-  /* border-radius: 5px; */
   flex-shrink: 0;
   background-color: #343a40;
   color: #fff;
   border-radius: 5px;
   border: none;
-  /* margin-top: 5px; */
   border-radius: 50%;
 }
 button:hover {
   background-color: black;
   color: #fff;
-  /* box-shadow: none; */
 }
 .add-row-button-container {
   display: flex;
@@ -354,21 +304,20 @@ button:hover {
   margin-bottom: 5px;
   height: 32px;
   width: calc(100% - 15px - 37px);
-  /* background-color: #00796B; */
-  /* box-shadow: none; */
-  /* box-shadow: 3px 3px 0 black; */
-  /* border-bottom: 2px solid #000; */
-  /* border-top: 3px solid #BDBDBD; */
-  /* border-radius: 0px 0px 5px 5px; */
 }
-/* .add-row-button:hover {
-    background-color: rgb(1, 88, 78);
-    color: #fff;
-  } */
+
+.lot-table input.damaged-price {
+  background-color: rgb(168, 66, 168);
+  border-color: rgb(168, 66, 168);
+  box-shadow: 0 0 20px red;
+}
+.lot-table input.communised-price {
+  background-color: red;
+  border-color: red;
+  box-shadow: 0 0 20px red;
+}
 input:invalid {
-  /* outline: #a31818 solid 4px; */
   outline: 0.3rem solid #a31818;
-  /* box-shadow: 3px 3px 0 #000; */
 }
 @media screen and (max-width: 650px) {
   input {

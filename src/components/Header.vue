@@ -1,17 +1,8 @@
 <template>
-  <header :style="bgGradient">
-    <div>
-      <!-- <h1><img src="../assets/img/blank_logo_d.png" /></h1> -->
-    </div>
+  <header :style="{ background: bgGradient }">
+    <div></div>
     <div>
       <h1><span>Помойный </span>аукцион</h1>
-      <!-- <nav>
-        <ul>
-          <li><router-link to='/auk'>Auction</router-link></li>
-          <li><router-link>About</router-link></li>
-          <li><router-link>Rules</router-link></li>
-        </ul>
-      </nav> -->
     </div>
     <div>
       <ul>
@@ -32,34 +23,32 @@
     </div>
   </header>
 </template>
-<script>
-export default {
-  name: 'Header',
+<script lang="ts">
+import { Component, Vue } from 'vue-property-decorator';
+
+@Component({
   props: {
-    bloodyLevel: {
-      type: Number,
-      default: 0
-    }
-  },
-  computed: {
-    bgGradient () {
-      return {
-        background: `linear-gradient(180deg, rgba(100,9,9,1) 
-        ${(this.bloodyLevel / 3.5) * 100}%, 
-        #2e2e2e ${(this.bloodyLevel / 2.5) * 100}%) !important`
-      }
-    }
-  },
+    bloodyLevel: { type: Number, default: 0 }
+  }
+})
+class Header extends Vue {
+  bloodyLevel: number = 0;
+  get bgGradient (): string {
+    return `linear-gradient(180deg, rgba(100,9,9,1)
+        ${(this.bloodyLevel / 3.5) * 100}%,
+        #2e2e2e ${(this.bloodyLevel / 2.5) * 100}%) !important`;
+  }
+
   created () {
-    this.$store.dispatch('getAuth').then()
-    this.$store.dispatch('getId').then()
-  },
-  methods: {
-    sendNotification () {
-      this.$store.dispatch('sendNotification').then()
-    }
+    this.$store.dispatch('getAuth').then();
+    this.$store.dispatch('getId').then();
+  }
+
+  sendNotification () {
+    this.$store.dispatch('sendNotification').then();
   }
 }
+export default Header;
 </script>
 
 <style scoped>

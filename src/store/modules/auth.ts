@@ -1,65 +1,86 @@
-import axios from 'axios'
+import axios from 'axios';
+import { Getters, Mutations, Actions, Module } from 'vuex-smart-module';
 
-export default {
-  state: {
-    auth: false,
-    id: null,
-    notifResponse: null
-  },
+class AuthState {
+  auth: boolean = false;
+  id: number | null = null;
+  notifResponse: null | any = null;
+}
 
-  mutations: {
-    setAuth (state, data) {
-      state.auth = data
-    },
-    setId (state, data) {
-      state.id = data
-    },
-    setNotifResponse (state, data) {
-      state.notifResponse = data
-    }
-  },
+class AuthGetters extends Getters<AuthState> {
+  get getAuth () {
+    return this.state.auth;
+  }
 
-  getters: {
-    getAuth: state => state.auth,
-    getId: state => state.id,
-    getNotifResponse: state => state.notifResponse
-  },
+  get getId () {
+    return this.state.id;
+  }
 
-  actions: {
-    getAuth (context) {
-      axios('/auth', {
-        method: 'GET'
-      })
-        .then(response => {
-          context.commit('setAuth', response.data)
-        })
-        .catch(error => {
-          console.log(error)
-        })
-    },
-
-    getId (context) {
-      axios('/id', {
-        method: 'GET'
-      })
-        .then(response => {
-          context.commit('setId', response.data)
-        })
-        .catch(error => {
-          console.log(error)
-        })
-    },
-
-    sendNotification (context) {
-      axios('/send/notification', {
-        method: 'POST'
-      })
-        .then(response => {
-          context.commit('setNotifResponse', response.data)
-        })
-        .catch(error => {
-          console.log(error)
-        })
-    }
+  get getNotifResponse () {
+    return this.state.notifResponse;
   }
 }
+class AuthMutations extends Mutations<AuthState> {
+  setAuth (data: boolean) {
+    this.state.auth = data;
+  }
+
+  setId (data: number) {
+    this.state.id = data;
+  }
+
+  setNotifResponse (data: any) {
+    this.state.notifResponse = data;
+  }
+}
+
+class AuthActions extends Actions<
+  AuthState,
+  AuthGetters,
+  AuthMutations,
+  AuthActions
+> {
+  getAuth () {
+    axios('/auth', {
+      method: 'GET'
+    })
+      .then(response => {
+        this.commit('setAuth', response.data);
+      })
+      .catch(error => {
+        console.log(error);
+      });
+  }
+
+  getId () {
+    axios('/id', {
+      method: 'GET'
+    })
+      .then(response => {
+        this.commit('setId', response.data);
+      })
+      .catch(error => {
+        console.log(error);
+      });
+  }
+
+  sendNotification () {
+    axios('/send/notification', {
+      method: 'POST'
+    })
+      .then(response => {
+        this.commit('setNotifResponse', response.data);
+      })
+      .catch(error => {
+        console.log(error);
+      });
+  }
+}
+
+export const Auth = new Module({
+  state: AuthState,
+  getters: AuthGetters,
+  mutations: AuthMutations,
+  actions: AuthActions,
+  namespaced: false
+});

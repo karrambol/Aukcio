@@ -12,59 +12,65 @@
   </div>
 </template>
 
-<script>
-import Header from './Header.vue'
-import Timer from './Timer.vue'
-import AukTable from './AukTable.vue'
-import Flame from './Flame.vue'
+<script lang="ts">
+import Header from './Header.vue';
+import Timer from './Timer.vue';
+import AukTable from './AukTable.vue';
+import Flame from './Flame.vue';
+import { Component, Vue } from 'vue-property-decorator';
 
-export default {
+@Component({
   components: {
     Header,
     Timer,
     AukTable,
     Flame
-  },
-  data () {
-    return {
-      bloodyLevel: 0,
-      timeout: undefined,
-      flameOn: true
-    }
-  },
+  }
+})
+class Auk extends Vue {
+  bloodyLevel: number = 0;
+  timeout: number = 0;
+  flameOn: boolean = true;
+
   created () {
-    const _this = this // eslint-disable-line @typescript-eslint/no-this-alias
-    window.onkeydown = function (event) {
+    const toggle = this.toggleFrameOn;
+    window.onkeydown = function (event: KeyboardEvent) {
       if (event.ctrlKey && event.keyCode === 81) {
-        _this.flameOn = !_this.flameOn
+        toggle();
       }
-    }
-  },
-  methods: {
-    bloodyHandler: function () {
-      this.$emit('add', '666')
-      if (this.bloodyLevel >= 2) this.bloodyLevel = 3
-      else this.bloodyLevel += 1
-      this.$emit('bloody', this.bloodyLevel)
-      this.bloodySub()
-    },
-    bloodySub: function () {
-      clearTimeout(this.timeout)
-      if (this.bloodyLevel >= 3) {
-        this.timeout = setTimeout(() => {
-          this.bloodyLevel -= 1
-          console.log(this.bloodyLevel)
-        }, 20 * 60 * 1000)
-      } else {
-        this.timeout = setTimeout(() => {
-          this.bloodyLevel -= 1
-          console.log(this.bloodyLevel)
-          if (this.bloodyLevel > 0) this.bloodySub()
-        }, 5 * 60 * 1000)
-      }
+    };
+  }
+
+  toggleFrameOn () {
+    this.flameOn = !this.flameOn;
+  }
+
+  bloodyHandler () {
+    this.$emit('add', '666');
+    if (this.bloodyLevel >= 2) this.bloodyLevel = 3;
+    else this.bloodyLevel += 1;
+    this.$emit('bloody', this.bloodyLevel);
+    this.bloodySub();
+  }
+
+  bloodySub () {
+    clearTimeout(this.timeout);
+    if (this.bloodyLevel >= 3) {
+      this.timeout = setTimeout(() => {
+        this.bloodyLevel -= 1;
+        console.log(this.bloodyLevel);
+      }, 20 * 60 * 1000);
+    } else {
+      this.timeout = setTimeout(() => {
+        this.bloodyLevel -= 1;
+        console.log(this.bloodyLevel);
+        if (this.bloodyLevel > 0) this.bloodySub();
+      }, 5 * 60 * 1000);
     }
   }
 }
+
+export default Auk;
 </script>
 <style scoped>
 .main {
@@ -73,7 +79,6 @@ export default {
 }
 
 .auk-row {
-  /* background: #073642; */
   flex-grow: 0;
   flex-shrink: 1;
   display: flex;
@@ -91,7 +96,6 @@ export default {
 }
 .right-col {
   z-index: 100;
-  /* background: url(./img/background.webp) repeat; */
   flex-grow: 1;
   flex-shrink: 1;
   max-width: 440px;

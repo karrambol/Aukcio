@@ -1,13 +1,21 @@
-import Vue from 'vue'
-import Vuex, { StoreOptions } from 'vuex'
-import tableData from './modules/tableData'
-import auth from './modules/auth'
+import Vue from 'vue';
+import Vuex from 'vuex';
+import { createStore, Module } from 'vuex-smart-module';
+import { TableData } from './modules/TableData';
+import { Auth } from './modules/auth';
 
-Vue.use(Vuex)
-
-export default new Vuex.Store({
+Vue.use(Vuex);
+const root = new Module({
   modules: {
-    tableData,
-    auth
+    Auth,
+    TableData
   }
-})
+});
+export const store = createStore(
+  root,
+
+  {
+    strict: process.env.NODE_ENV !== 'production'
+  }
+);
+export default store;

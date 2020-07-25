@@ -1,77 +1,82 @@
 <template>
   <div id="app" :style="appStyle">
-    <p id="amount">666</p>
+    <p id="amount" v-bind:class="{ visible: getAmountVisible }">666</p>
     <div class="wrapper">
       <router-view v-on:bloody="bloodyHandler" v-on:add="addHandler" />
     </div>
   </div>
 </template>
 
-<script>
-export default {
-  name: 'App',
-  created () {
-    this.daemonVoice = (function () {
-      const audio = new Audio()
-      audio.src = require('./assets/audio/daemon_voice.mp3')
-      return function () {
-        audio.play()
-      }
-    })()
-  },
-  data () {
+<script lang="ts">
+import { Component, Vue } from 'vue-property-decorator';
+
+@Component
+class App extends Vue {
+  mainColor = '#009688';
+  bloodyColor = '#c3332b';
+  isBloody = false;
+  timeoutID = 0;
+  amountVisible = false;
+  daemonVoice = (function () {
+    const audio = new Audio();
+    audio.src = require('./assets/audio/daemon_voice.mp3');
+    return function () {
+      audio.play();
+    };
+  })();
+
+  get getAmountVisible () {
+    return this.amountVisible;
+  }
+
+  get appStyle () {
     return {
-      mainColor: '#009688',
-      bloodyColor: '#c3332b',
-      isBloody: false,
-      timeoutID: undefined
+      '--bgc': this.isBloody ? this.bloodyColor : this.mainColor
+    };
+  }
+
+  get background () {
+    return {
+      background: `url(./assets/img/background_transparent.png), ${
+        this.isBloody ? this.bloodyColor : this.mainColor
+      } !important`,
+      'background-blend-mode': 'multiply'
+    };
+  }
+
+  bloodyHandler (bloodyLevel: number) {
+    if (bloodyLevel >= 3 && this.timeoutID === 0) {
+      this.isBloody = true;
+      this.daemonVoice();
+      clearTimeout(this.timeoutID);
+      this.timeoutID = setTimeout(() => {
+        this.isBloody = false;
+        this.timeoutID = 0;
+      }, 20 * 60 * 1000);
+    } else if (bloodyLevel >= 3) {
+      clearTimeout(this.timeoutID);
+      this.timeoutID = this.timeoutID = setTimeout(() => {
+        this.isBloody = false;
+        this.timeoutID = 0;
+      }, 20 * 60 * 1000);
     }
-  },
-  computed: {
-    appStyle () {
-      return {
-        '--bgc': this.isBloody ? this.bloodyColor : this.mainColor
-      }
-    },
-    background () {
-      return {
-        background: `url(./assets/img/background_transparent.png), ${
-          this.isBloody ? this.bloodyColor : this.mainColor
-        } !important`,
-        'background-blend-mode': 'multiply'
-      }
-    }
-  },
-  methods: {
-    bloodyHandler: function (bloodyLevel) {
-      console.log('app', bloodyLevel)
-      if (bloodyLevel >= 3 && this.timeoutID === undefined) {
-        this.isBloody = true
-        this.daemonVoice()
-        clearTimeout(this.timeoutID)
-        this.timeoutID = setTimeout(() => {
-          this.isBloody = false
-          this.timeoutID = undefined
-        }, 20 * 60 * 1000)
-      } else if (bloodyLevel >= 3) {
-        clearTimeout(this.timeoutID)
-        this.timeoutID = this.timeoutID = setTimeout(() => {
-          this.isBloody = false
-          this.timeoutID = undefined
-        }, 20 * 60 * 1000)
-      }
-    },
-    addHandler: function (amount) {
-      console.log('amount', amount === '666')
-      if (amount === '666') {
-        document.getElementById('amount').classList.add('visible')
-        setTimeout(() => {
-          document.getElementById('amount').classList.remove('visible')
-        }, 500)
-      }
+  }
+
+  setAmountVisible (value: boolean) {
+    this.amountVisible = value;
+  }
+
+  addHandler (amount: string) {
+    const set = this.setAmountVisible;
+    if (amount === '666') {
+      set(true);
+      setTimeout(() => {
+        set(false);
+      }, 500);
     }
   }
 }
+export default App;
 </script>
 
 <style>
@@ -86,8 +91,8 @@ export default {
   opacity: 0;
   pointer-events: none;
 }
-.visible {
-  opacity: 1 !important;
+p#amount.visible {
+  opacity: 1;
 }
 html {
   max-height: 100vh;
