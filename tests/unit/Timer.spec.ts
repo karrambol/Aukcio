@@ -1,16 +1,18 @@
-/* eslint-ignore @typescript-eslint/no-empty-function */
+/* eslint-disable @typescript-eslint/no-empty-function */
+import { expect } from 'chai';
+import Vuex, { Store } from 'vuex';
 import { createLocalVue, shallowMount, Wrapper } from '@vue/test-utils';
 import Timer from '@/components/Timer.vue';
-import { expect } from 'chai';
-import Vuex from 'vuex';
 import FakeTimers from '@sinonjs/fake-timers';
+import { RootModule } from '@/store/modules';
+import { createVuexStore } from 'vuex-simple';
 
 const localVue = createLocalVue();
 localVue.use(Vuex);
 
 let clock: FakeTimers.InstalledClock;
 let wrapper: Wrapper<Timer>;
-let store;
+let store: Store<RootModule>;
 let frame = 1;
 window.performance.now = () => Date.now();
 window.requestAnimationFrame = function (callback) {
@@ -18,18 +20,11 @@ window.requestAnimationFrame = function (callback) {
   return frame++;
 };
 beforeEach(() => {
-  store = new Vuex.Store({
-    state: {
-      bank: 0
-    },
-    getters: {
-      bank: state => state.bank
-    },
-    mutations: {
-      bankSet: function (state, value) {
-        state.bank = value;
-      }
-    }
+  const instance = new RootModule();
+  store = createVuexStore(instance, {
+    strict: true,
+    modules: {},
+    plugins: []
   });
   clock = FakeTimers.install();
   wrapper = shallowMount(Timer, {
@@ -310,7 +305,7 @@ describe('add and sub buttons', () => {
 });
 describe('bank evaluation', () => {
   it('100', async () => {
-    wrapper.vm.$store.commit('bankSet', 100);
+    wrapper.vm.$data.store.TableData.setPValue({ id: 0, value: 100 });
     await setTimeout(() => {}, 1);
     const text = wrapper.find('.wasted-bank').text();
     const bankEvaluated = parseFloat(text);
@@ -318,7 +313,7 @@ describe('bank evaluation', () => {
     expect(bankEvaluated).to.be.equal(100);
   });
   it('1000.01', async () => {
-    wrapper.vm.$store.commit('bankSet', 1000.01);
+    wrapper.vm.$data.store.TableData.setPValue({ id: 0, value: 1000.01 });
     await setTimeout(() => {}, 1);
     const text = wrapper.find('.wasted-bank').text();
     const bankEvaluated = parseFloat(text);

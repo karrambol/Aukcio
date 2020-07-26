@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { Getters, Mutations, Actions, Module } from 'vuex-smart-module';
+import { Mutation, State } from 'vuex-simple';
 
 class AuthState {
   auth: boolean = false;
@@ -7,7 +7,10 @@ class AuthState {
   notifResponse: null | any = null;
 }
 
-class AuthGetters extends Getters<AuthState> {
+export class Auth {
+  @State()
+  state: AuthState = new AuthState();
+
   get getAuth () {
     return this.state.auth;
   }
@@ -19,45 +22,40 @@ class AuthGetters extends Getters<AuthState> {
   get getNotifResponse () {
     return this.state.notifResponse;
   }
-}
-class AuthMutations extends Mutations<AuthState> {
+
+  @Mutation()
   setAuth (data: boolean) {
     this.state.auth = data;
   }
 
+  @Mutation()
   setId (data: number) {
     this.state.id = data;
   }
 
+  @Mutation()
   setNotifResponse (data: any) {
     this.state.notifResponse = data;
   }
-}
 
-class AuthActions extends Actions<
-  AuthState,
-  AuthGetters,
-  AuthMutations,
-  AuthActions
-> {
-  getAuth () {
+  fetchAuth () {
     axios('/auth', {
       method: 'GET'
     })
       .then(response => {
-        this.commit('setAuth', response.data);
+        this.setAuth(response.data);
       })
       .catch(error => {
         console.log(error);
       });
   }
 
-  getId () {
+  fetchId () {
     axios('/id', {
       method: 'GET'
     })
       .then(response => {
-        this.commit('setId', response.data);
+        this.setId(response.data);
       })
       .catch(error => {
         console.log(error);
@@ -69,18 +67,10 @@ class AuthActions extends Actions<
       method: 'POST'
     })
       .then(response => {
-        this.commit('setNotifResponse', response.data);
+        this.setNotifResponse(response.data);
       })
       .catch(error => {
         console.log(error);
       });
   }
 }
-
-export const Auth = new Module({
-  state: AuthState,
-  getters: AuthGetters,
-  mutations: AuthMutations,
-  actions: AuthActions,
-  namespaced: false
-});

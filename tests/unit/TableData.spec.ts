@@ -1,41 +1,42 @@
 import { expect } from 'chai';
-import Vuex, { Store } from 'vuex';
+import Vuex from 'vuex';
 import { createLocalVue } from '@vue/test-utils';
-import { createStore, Module } from 'vuex-smart-module';
-import { TableDataMutations } from '@/store/modules/TableData/mutations';
-import { StateUnit, Lot, BankHistoryUnit, LogUnit } from '@/types';
+import { Lot, BankHistoryUnit, LogUnit } from '@/types';
+import { TableData } from '@/store/modules/TableData';
+import { createVuexStore, useStore } from 'vuex-simple';
 
 const localVue = createLocalVue();
 localVue.use(Vuex);
 
-let store: Store<StateUnit>;
+let store: TableData;
 
 beforeEach(() => {
-  const m = new Module({
-    state: StateUnit,
-    mutations: TableDataMutations
+  const m = new TableData();
+  const storeInst = createVuexStore(m, {
+    strict: false,
+    modules: {},
+    plugins: []
   });
-  store = createStore(m);
+  store = useStore(storeInst);
 });
 describe('Mutations', () => {
   it('setTitle', () => {
-    store.commit('setTitle', { id: 2, value: 'A1' });
+    store.setTitle({ id: 2, value: 'A1' });
 
     expect(store.state.lots[2].title).to.be.equal('A1');
   });
   it('setAdd', () => {
-    store.commit('setAdd', { id: 2, value: '1234' });
-
+    store.setAdd({ id: 2, value: '1234' });
     expect(store.state.lots[2].add).to.be.equal('1234');
   });
   it('addToP', () => {
-    store.commit('setPValue', { id: 2, value: '1234' });
+    store.setPValue({ id: 2, value: '1234' });
 
     expect(store.state.lots[2].p).to.be.equal('1234');
   });
   describe('sortLots', () => {
     it('initial state input do nothing', () => {
-      store.commit('sortLots');
+      store.sortLots();
 
       expect(store.state.lots).to.be.deep.equal([
         new Lot(0),
@@ -51,7 +52,7 @@ describe('Mutations', () => {
         new Lot(2, 'c', 3, 13),
         new Lot(3, 'd', 4, 14)
       ];
-      store.commit('sortLots');
+      store.sortLots();
 
       expect(store.state.lots).to.be.deep.equal([
         new Lot(3, 'd', 4, 14),
@@ -67,7 +68,7 @@ describe('Mutations', () => {
         new Lot(2, 'c', 'NaN', 13),
         new Lot(3, 'd', 4, 14)
       ];
-      store.commit('sortLots');
+      store.sortLots();
 
       expect(store.state.lots).to.be.deep.equal([
         new Lot(3, 'd', 4, 14),
@@ -87,7 +88,7 @@ describe('Mutations', () => {
         new Lot(6, '', 4),
         new Lot(7, '', 0)
       ];
-      store.commit('sortLots');
+      store.sortLots();
 
       expect(store.state.lots).to.be.deep.equal([
         new Lot(6, '', 4),
@@ -102,7 +103,7 @@ describe('Mutations', () => {
     });
   });
   it('push new lot', () => {
-    store.commit('push');
+    store.push();
 
     expect(store.state.lots).to.be.deep.equal([
       new Lot(0),
@@ -113,7 +114,7 @@ describe('Mutations', () => {
     ]);
   });
   it('addBankHistoryUnit', () => {
-    store.commit('addBankHistoryUnit', 200);
+    store.addBankHistoryUnit(200);
 
     expect(store.state.bankHistory).to.be.deep.equal([
       new BankHistoryUnit(0),
@@ -130,7 +131,7 @@ describe('Mutations', () => {
       new Lot(3, '', ''),
       new Lot(3, '', 'NaN')
     ];
-    store.commit('mutateArmageddon');
+    store.mutateArmageddon();
 
     expect(store.state.lots).to.be.deep.equal([
       new Lot(0, '', 50),
@@ -152,7 +153,7 @@ describe('Mutations', () => {
       new Lot(5, '', ''),
       new Lot(6, '', 'NaN')
     ];
-    store.commit('mutateCommunism', 50.1);
+    store.mutateCommunism(50.1);
 
     expect(store.state.lots).to.be.deep.equal([
       new Lot(0, '', 50.1),
@@ -167,7 +168,7 @@ describe('Mutations', () => {
   it('createSnapShot', () => {
     store.state.lots = [new Lot(0, '', 1), new Lot(1), new Lot(2), new Lot(3)];
     store.state.bankHistory = [new BankHistoryUnit(0), new BankHistoryUnit(1)];
-    store.commit('createSnapShot');
+    store.createSnapShot();
 
     expect(store.state.log[1]).to.be.deep.include({
       lots: [new Lot(0, '', 1), new Lot(1), new Lot(2), new Lot(3)],
@@ -177,7 +178,7 @@ describe('Mutations', () => {
   });
   describe('undo and redo mutations', () => {
     it('undo from initial state do nothing', () => {
-      store.commit('undo');
+      store.undo();
 
       expect(store.state).to.be.deep.equal({
         log: [new LogUnit()],
@@ -197,8 +198,8 @@ describe('Mutations', () => {
         new BankHistoryUnit(0),
         new BankHistoryUnit(1)
       ];
-      store.commit('createSnapShot');
-      store.commit('undo');
+      store.createSnapShot();
+      store.undo();
 
       expect(store.state).to.be.deep.equal({
         log: [
@@ -216,7 +217,7 @@ describe('Mutations', () => {
     });
 
     it('redo from initial state do nothing', () => {
-      store.commit('redo');
+      store.redo();
 
       expect(store.state).to.be.deep.equal({
         log: [new LogUnit()],
@@ -226,49 +227,49 @@ describe('Mutations', () => {
       });
     });
     it('3 times logging, undo, redo', () => {
-      store.commit('setPValue', { id: 0, value: 1 });
-      store.commit('createSnapShot');
-      store.commit('setPValue', { id: 0, value: 12 });
-      store.commit('createSnapShot');
-      store.commit('setPValue', { id: 0, value: 123 });
-      store.commit('createSnapShot');
+      store.setPValue({ id: 0, value: 1 });
+      store.createSnapShot();
+      store.setPValue({ id: 0, value: 12 });
+      store.createSnapShot();
+      store.setPValue({ id: 0, value: 123 });
+      store.createSnapShot();
       const p = store.state.lots[0].p;
-      store.commit('undo');
-      store.commit('redo');
+      store.undo();
+      store.redo();
 
       expect(store.state.lots[0].p).to.be.equal(p);
     });
     it('3 times logging, undo, logging, redo do nothing', () => {
-      store.commit('setPValue', { id: 0, value: 1 });
-      store.commit('createSnapShot');
-      store.commit('setPValue', { id: 0, value: 12 });
-      store.commit('createSnapShot');
-      store.commit('setPValue', { id: 0, value: 123 });
-      store.commit('createSnapShot');
-      store.commit('undo');
-      store.commit('setPValue', { id: 0, value: 124 });
-      store.commit('createSnapShot');
+      store.setPValue({ id: 0, value: 1 });
+      store.createSnapShot();
+      store.setPValue({ id: 0, value: 12 });
+      store.createSnapShot();
+      store.setPValue({ id: 0, value: 123 });
+      store.createSnapShot();
+      store.undo();
+      store.setPValue({ id: 0, value: 124 });
+      store.createSnapShot();
       const p = store.state.lots[0].p;
-      store.commit('redo');
+      store.redo();
 
       expect(store.state.lots[0].p).to.be.equal(p);
     });
     it('3 times logging, 2 undo, 2 logging, 3 undo return to initial lots state', () => {
-      store.commit('setPValue', { id: 0, value: 1 });
-      store.commit('createSnapShot');
-      store.commit('setPValue', { id: 0, value: 12 });
-      store.commit('createSnapShot');
-      store.commit('setPValue', { id: 0, value: 123 });
-      store.commit('createSnapShot');
-      store.commit('undo');
-      store.commit('undo');
-      store.commit('setPValue', { id: 0, value: 14 });
-      store.commit('createSnapShot');
-      store.commit('setPValue', { id: 0, value: 145 });
-      store.commit('createSnapShot');
-      store.commit('undo');
-      store.commit('undo');
-      store.commit('undo');
+      store.setPValue({ id: 0, value: 1 });
+      store.createSnapShot();
+      store.setPValue({ id: 0, value: 12 });
+      store.createSnapShot();
+      store.setPValue({ id: 0, value: 123 });
+      store.createSnapShot();
+      store.undo();
+      store.undo();
+      store.setPValue({ id: 0, value: 14 });
+      store.createSnapShot();
+      store.setPValue({ id: 0, value: 145 });
+      store.createSnapShot();
+      store.undo();
+      store.undo();
+      store.undo();
 
       expect(store.state.lots[0].p).to.be.equal('');
     });

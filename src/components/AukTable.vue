@@ -1,68 +1,61 @@
 <script lang="tsx">
 import { Component, Vue } from 'vue-property-decorator';
 import { Lot } from '@/types';
-import { rootModule } from '@/store';
-// interface ChangeEvent extends any {
-//   target: Target<T=string> extends EventTarget {
-//     value: T
-//   }
-// }
-
-type ThisStore = typeof rootModule;
+import { useStore } from 'vuex-simple';
+import { RootModule } from '@/store/modules';
 
 @Component
 class AukTable extends Vue {
-  store: ThisStore = this.$store;
+  store: RootModule = useStore(this.$store);
+
   get tableData (): Lot[] {
-    return this.$store.getters.tableData;
+    return this.store.TableData.tableData;
   }
 
   get armageddonPrice (): number {
-    return this.$store.getters.armageddonPrice;
+    return this.store.TableData.armageddonPrice;
   }
 
   get communismPrice (): number {
-    return this.$store.getters.communismPrice;
+    return this.store.TableData.communismPrice;
   }
 
   get activeLots (): number {
-    return this.$store.getters.activeLots;
+    return this.store.TableData.activeLots;
   }
 
   push () {
-    this.$store.commit('push', {});
+    this.store.TableData.push();
   }
 
   setTitle (id: number) {
     return (e: any) => {
-      this.$store.commit('setTitle', { id: id, value: e.target.value });
+      this.store.TableData.setTitle({ id: id, value: e.target.value });
     };
   }
 
   setP (id: number) {
     return (e: any) => {
-      console.dir(id);
-      console.dir(e);
-      this.$store.dispatch('setP', { id: id, value: e.target.value });
+      this.store.TableData.setP({ id: id, value: e.target.value });
     };
   }
 
   setAdd (id: number) {
     return (e: any) => {
-      this.$store.commit('setAdd', { id: id, value: e.target.value });
+      this.store.TableData.setAdd({ id: id, value: e.target.value });
     };
   }
 
   sort () {
-    this.$store.dispatch('sort', {});
+    this.store.TableData.sort();
   }
 
   pChangeHandler (id: number) {
     return (e: any) => {
       const value = e.target.value.replace(/,/gi, '.');
-      this.$store.dispatch('setP', { id: id, value: value });
-      this.$store.dispatch('sort', {});
-      this.$store.dispatch('updateBankHistory', {});
+      this.store.TableData.setP({ id: id, value: value });
+      this.store.TableData.sort();
+      this.store.TableData.updateBankHistory();
     };
   }
 
@@ -71,26 +64,25 @@ class AukTable extends Vue {
       let value = e.target.value.replace(/,/gi, '.');
       const newString = parseFloat(value);
       value = isNaN(newString) ? value + '' : newString + '';
-      this.$store.commit('setAdd', { id: id, value: value });
+      this.store.TableData.setAdd({ id: id, value: value });
     };
   }
 
   add (id: number) {
     return () => {
-      if (this.$store.getters.is666(id)) {
-        console.log('666');
-        this.$emit('bloody', '');
+      if (this.store.TableData.is666(id)) {
+        this.$emit('bloody');
       }
-      this.$store.dispatch('add', id);
+      this.store.TableData.add(id);
     };
   }
 
   undo () {
-    this.$store.commit('undo', {});
+    this.store.TableData.undo();
   }
 
   redo () {
-    this.$store.commit('redo', {});
+    this.store.TableData.redo();
   }
 
   armageddon () {
@@ -99,7 +91,7 @@ class AukTable extends Vue {
       elements[i].classList.add('damaged-price');
       setTimeout(() => elements[i].classList.remove('damaged-price'), 200);
     }
-    this.$store.dispatch('armageddon', {});
+    this.store.TableData.armageddon();
   }
 
   communism () {
@@ -108,7 +100,7 @@ class AukTable extends Vue {
       elements[i].classList.add('communised-price');
       setTimeout(() => elements[i].classList.remove('communised-price'), 200);
     }
-    this.$store.dispatch('communism', {});
+    this.store.TableData.communism();
   }
 
   render () {

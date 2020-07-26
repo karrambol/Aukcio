@@ -1,5 +1,7 @@
 <script lang="tsx">
 import { Component, Vue } from 'vue-property-decorator';
+import { useStore } from 'vuex-simple';
+import { RootModule } from '@/store/modules';
 
 @Component
 class Timer extends Vue {
@@ -13,6 +15,7 @@ class Timer extends Vue {
   tickValue = 62;
   timeoutID = 0;
   lastTime = 0;
+  store: RootModule = useStore(this.$store);
 
   created () {
     this.aukStart = window.performance.now();
@@ -29,7 +32,7 @@ class Timer extends Vue {
   }
 
   get bank (): number {
-    return this.$store.getters.bank;
+    return this.store.TableData.bank;
   }
 
   get wastedTimeString (): string {

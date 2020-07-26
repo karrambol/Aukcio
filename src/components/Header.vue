@@ -1,6 +1,8 @@
 <script lang="tsx">
 import { Component } from 'vue-property-decorator';
 import * as tsx from 'vue-tsx-support';
+import { RootModule } from '@/store/modules';
+import { useStore } from 'vuex-simple';
 
 interface HeaderProps {
   bloodyLevel: number;
@@ -13,6 +15,7 @@ interface HeaderProps {
 })
 class Header extends tsx.Component<HeaderProps> {
   bloodyLevel: number = 0;
+  store: RootModule = useStore(this.$store);
 
   get bgGradient (): { background: string } {
     return {
@@ -23,12 +26,12 @@ class Header extends tsx.Component<HeaderProps> {
   }
 
   created () {
-    this.$store.dispatch('getAuth').then();
-    this.$store.dispatch('getId').then();
+    this.store.Auth.fetchAuth();
+    this.store.Auth.fetchId();
   }
 
   sendNotification () {
-    this.$store.dispatch('sendNotification').then();
+    this.store.Auth.sendNotification();
   }
 
   render () {
@@ -41,10 +44,10 @@ class Header extends tsx.Component<HeaderProps> {
           </h1>
         </div>
         <div>
-          {this.$store.getters.getAuth ? (
+          {this.store.Auth.getAuth ? (
             <ul>
               <li>
-                <h2>ID: {this.$store.getters.getId}</h2>
+                <h2>ID: {this.store.Auth.getId}</h2>
               </li>
               <li>
                 <a on-click={this.sendNotification}>

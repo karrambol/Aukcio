@@ -1,6 +1,8 @@
 <script lang="tsx">
 import { Component, Vue } from 'vue-property-decorator';
 import { BankHistoryUnit } from '../types';
+import { RootModule } from '@/store/modules';
+import { useStore } from 'vuex-simple';
 
 @Component
 class Flame extends Vue {
@@ -11,6 +13,7 @@ class Flame extends Vue {
   fast = false;
   invisibleFlame = true;
   x = 12;
+  store: RootModule = useStore(this.$store);
 
   get classObject (): {
     fast: boolean;
@@ -61,15 +64,15 @@ class Flame extends Vue {
   }
 
   get bankHistory (): BankHistoryUnit[] {
-    return this.$store.getters.bankHistory;
+    return this.store.TableData.bankHistory;
   }
 
   get bank (): number {
-    return this.$store.getters.bank;
+    return this.store.TableData.bank;
   }
 
   get maxPrice (): number {
-    return this.$store.getters.maxPrice;
+    return this.store.TableData.maxPrice;
   }
 
   get bankAgo (): number {
