@@ -5,6 +5,7 @@
     "strict": true,
     // "strictPropertyInitialization": false,
     "jsx": "preserve",
+    "jsxFactory": "VueTsxSupport",
     "importHelpers": true,
     "moduleResolution": "node",
     "experimentalDecorators": true,
@@ -26,7 +27,8 @@
     "tests/**/*.tsx",
     "src/store/index.ts",
     "src/main.ts",
-    "tests/unit/Timer.spec.ts"
+    "tests/unit/Timer.spec.ts",
+    "node_modules/vue-tsx-support/enable-check.d.ts"
   ],
   "exclude": ["node_modules"]
 }

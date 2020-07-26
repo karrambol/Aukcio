@@ -1,37 +1,4 @@
-<template>
-  <div class="timer-row">
-    <div class="wasted">
-      <div>
-        Потрачено время: <span class="wasted-time">{{ wastedTimeString }}</span>
-      </div>
-      <div>
-        Банк: <span class="wasted-bank">{{ bank }}</span>
-      </div>
-    </div>
-    <div class="timer-container">
-      <div class="timer-top timer-line">
-        <button v-if="isGoing" v-on:click="stop()" class="button-start">
-          СТОП
-        </button>
-        <button v-else v-on:click="start()" class="button-start">СТАРТ</button>
-        <div class="time-container">
-          <div class="time">
-            {{ minutes }}:{{ seconds }}<span>.{{ milliseconds }}</span>
-          </div>
-        </div>
-        <button v-on:click="clear()" class="button-clear">СБРОС</button>
-      </div>
-
-      <div class="timer-bot timer-line">
-        <button v-on:click="addSmall()" class="timer-button">+1</button>
-        <button v-on:click="addBig()" class="timer-button">+2</button>
-        <button v-on:click="setEven()" class="timer-button">=10</button>
-        <button v-on:click="subSmall()" class="timer-button">-1</button>
-      </div>
-    </div>
-  </div>
-</template>
-<script lang="ts">
+<script lang="tsx">
 import { Component, Vue } from 'vue-property-decorator';
 
 @Component
@@ -154,6 +121,61 @@ class Timer extends Vue {
     } else {
       this.clear();
     }
+  }
+
+  render () {
+    return (
+      /* eslint-disable indent */
+      <div class='timer-row'>
+        <div class='wasted'>
+          <div>
+            Потрачено время: {''}
+            <span class='wasted-time'>{this.wastedTimeString}</span>
+          </div>
+          <div>
+            Банк: <span class='wasted-bank'>{this.bank}</span>
+          </div>
+        </div>
+        <div class='timer-container'>
+          <div class='timer-top timer-line'>
+            {this.isGoing ? (
+              /* eslint-enable indent */
+              <button onClick={this.stop} class='button-start'>
+                СТОП
+              </button>
+            ) : (
+              <button onClick={this.start} class='button-start'>
+                СТАРТ
+              </button>
+            )}
+            <div class='time-container'>
+              <div class='time'>
+                {this.minutes}:{this.seconds}
+                <span>.{this.milliseconds}</span>
+              </div>
+            </div>
+            <button onClick={this.clear} class='button-clear'>
+              СБРОС
+            </button>
+          </div>
+
+          <div class='timer-bot timer-line'>
+            <button onClick={this.addSmall} class='timer-button'>
+              +1
+            </button>
+            <button onClick={this.addBig} class='timer-button'>
+              +2
+            </button>
+            <button onClick={this.setEven} class='timer-button'>
+              =10
+            </button>
+            <button onClick={this.subSmall} class='timer-button'>
+              -1
+            </button>
+          </div>
+        </div>
+      </div>
+    );
   }
 }
 

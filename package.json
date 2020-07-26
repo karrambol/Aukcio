@@ -5,7 +5,8 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "unit": "nyc vue-cli-service test:unit",
+    "unit": "vue-cli-service test:unit",
+    "unit:coverage": "nyc vue-cli-service test:unit",
     "test:e2e": "vue-cli-service test:e2e",
     "lint": "vue-cli-service lint"
   },
@@ -59,7 +60,8 @@
     "sass-loader": "^8.0.2",
     "source-map-support": "^0.5.19",
     "typescript": "~3.9.3",
-    "vue-template-compiler": "^2.6.11"
+    "vue-template-compiler": "^2.6.11",
+    "vue-tsx-support": "^3.0.0-preview.1"
   },
   "gitHooks": {
     "pre-commit": "lint-staged"

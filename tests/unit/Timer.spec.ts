@@ -59,7 +59,7 @@ describe('initial state', () => {
   it('correct wasted text', () => {
     const wastedEvalText = wrapper.find('.wasted').text();
 
-    expect(wastedEvalText).to.be.equal('Потрачено время: 00:00:00 Банк: 0');
+    expect(wastedEvalText).to.be.equal('Потрачено время: 00:00:00Банк: 0');
   });
 });
 describe('button-start when timer stoped', () => {

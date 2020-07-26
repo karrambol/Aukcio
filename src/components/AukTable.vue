@@ -1,73 +1,18 @@
-<template>
-  <div class="left-col">
-    <div class="top-controls-container">
-      <div class="left-top-buttons">
-        <button class="undo-button" v-on:click="undo()">
-          <font-awesome-icon icon="undo" />
-        </button>
-        <button class="redo-button" v-on:click="redo()">
-          <font-awesome-icon icon="redo" />
-        </button>
-      </div>
-      <div class="right-top-buttons">
-        <button
-          class="communism-button"
-          title="Построить коммунизм"
-          v-on:click="communism()"
-        >
-          <span>☭</span> {{ communismPrice }}
-        </button>
-        <button
-          class="armageddon-button"
-          title="Обрушить метеорит"
-          v-on:click="armageddon()"
-        >
-          <font-awesome-icon icon="meteor" /> {{ armageddonPrice }}
-        </button>
-      </div>
-    </div>
-    <transition-group class="lot-table" name="list" tag="p">
-      <div
-        v-for="(row, index) in tableData"
-        v-bind:key="row.id"
-        class="lot-row"
-      >
-        <input
-          class="lot-title"
-          type="text"
-          :value="row.title"
-          @input="setTitle(index, $event.target.value)"
-        />
-        <input
-          class="lot-price"
-          type="text"
-          :value="row.p"
-          @input="setP(index, $event.target.value)"
-          @change="pChangeHandler(index, $event.target.value)"
-        />
-        <input
-          class="lot-add"
-          type="text"
-          :value="row.add"
-          @input="setAdd(index, $event.target.value)"
-          @change="addChangeHandler(index, $event.target.value)"
-        />
-        <button class="add-button" @click="add(index, $event)">
-          +
-        </button>
-      </div>
-    </transition-group>
-    <div class="add-row-button-container">
-      <button class="add-row-button" v-on:click="push()">+</button>
-    </div>
-  </div>
-</template>
-<script lang="ts">
+<script lang="tsx">
 import { Component, Vue } from 'vue-property-decorator';
 import { Lot } from '@/types';
+import { rootModule } from '@/store';
+// interface ChangeEvent extends any {
+//   target: Target<T=string> extends EventTarget {
+//     value: T
+//   }
+// }
+
+type ThisStore = typeof rootModule;
 
 @Component
 class AukTable extends Vue {
+  store: ThisStore = this.$store;
   get tableData (): Lot[] {
     return this.$store.getters.tableData;
   }
@@ -88,42 +33,56 @@ class AukTable extends Vue {
     this.$store.commit('push', {});
   }
 
-  setTitle (id: number, value: string) {
-    this.$store.commit('setTitle', { id: id, value: value });
+  setTitle (id: number) {
+    return (e: any) => {
+      this.$store.commit('setTitle', { id: id, value: e.target.value });
+    };
   }
 
-  setP (id: number, value: string) {
-    this.$store.dispatch('setP', { id: id, value: value });
+  setP (id: number) {
+    return (e: any) => {
+      console.dir(id);
+      console.dir(e);
+      this.$store.dispatch('setP', { id: id, value: e.target.value });
+    };
   }
 
-  setAdd (id: number, value: string) {
-    this.$store.commit('setAdd', { id: id, value: value });
+  setAdd (id: number) {
+    return (e: any) => {
+      this.$store.commit('setAdd', { id: id, value: e.target.value });
+    };
   }
 
   sort () {
     this.$store.dispatch('sort', {});
   }
 
-  pChangeHandler (id: number, value: string) {
-    value = value.replace(/,/gi, '.');
-    this.$store.dispatch('setP', { id: id, value: value });
-    this.$store.dispatch('sort', {});
-    this.$store.dispatch('updateBankHistory', {});
+  pChangeHandler (id: number) {
+    return (e: any) => {
+      const value = e.target.value.replace(/,/gi, '.');
+      this.$store.dispatch('setP', { id: id, value: value });
+      this.$store.dispatch('sort', {});
+      this.$store.dispatch('updateBankHistory', {});
+    };
   }
 
-  addChangeHandler (id: number, value: string) {
-    value = value.replace(/,/gi, '.');
-    const newString = parseFloat(value);
-    value = isNaN(newString) ? value + '' : newString + '';
-    this.$store.commit('setAdd', { id: id, value: value });
+  addChangeHandler (id: number) {
+    return (e: any) => {
+      let value = e.target.value.replace(/,/gi, '.');
+      const newString = parseFloat(value);
+      value = isNaN(newString) ? value + '' : newString + '';
+      this.$store.commit('setAdd', { id: id, value: value });
+    };
   }
 
   add (id: number) {
-    if (this.$store.getters.is666(id)) {
-      console.log('666');
-      this.$emit('bloody', '');
-    }
-    this.$store.dispatch('add', id);
+    return () => {
+      if (this.$store.getters.is666(id)) {
+        console.log('666');
+        this.$emit('bloody', '');
+      }
+      this.$store.dispatch('add', id);
+    };
   }
 
   undo () {
@@ -150,6 +109,76 @@ class AukTable extends Vue {
       setTimeout(() => elements[i].classList.remove('communised-price'), 200);
     }
     this.$store.dispatch('communism', {});
+  }
+
+  render () {
+    return (
+      <div class='left-col'>
+        <div class='top-controls-container'>
+          <div class='left-top-buttons'>
+            <button class='undo-button' onClick={this.undo}>
+              <font-awesome-icon icon='undo' />
+            </button>
+            <button class='redo-button' onClick={this.redo}>
+              <font-awesome-icon icon='redo' />
+            </button>
+          </div>
+          <div class='right-top-buttons'>
+            <button
+              class='communism-button'
+              title='Построить коммунизм'
+              onClick={this.communism}
+            >
+              <span>☭</span> {this.communismPrice}
+            </button>
+            <button
+              class='armageddon-button'
+              title='Обрушить метеорит'
+              onClick={this.armageddon}
+            >
+              <font-awesome-icon icon='meteor' /> {this.armageddonPrice}
+            </button>
+          </div>
+        </div>
+        <transition-group class='lot-table' name='list' tag='p'>
+          {this.tableData.map((row, index) => {
+            return (
+              <div key={row.id} class='lot-row'>
+                <input
+                  key={index}
+                  class='lot-title'
+                  type='text'
+                  value={row.title}
+                  onInput={this.setTitle(index)}
+                />
+                <input
+                  class='lot-price'
+                  type='text'
+                  value={row.p}
+                  onInput={this.setP(index)}
+                  onChange={this.pChangeHandler(index)}
+                />
+                <input
+                  class='lot-add'
+                  type='text'
+                  value={row.add}
+                  onInput={this.setAdd(index)}
+                  onChange={this.addChangeHandler(index)}
+                />
+                <button class='add-button' onClick={this.add(index)}>
+                  +
+                </button>
+              </div>
+            );
+          })}
+        </transition-group>
+        <div class='add-row-button-container'>
+          <button class='add-row-button' onClick={this.push}>
+            +
+          </button>
+        </div>
+      </div>
+    );
   }
 }
 

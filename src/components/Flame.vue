@@ -1,34 +1,4 @@
-<template>
-  <div
-    class="background-flame flame"
-    id="background-flame"
-    v-bind:class="classObject"
-    :style="{ backgroundPositionY: `${this.pos}vh` }"
-  >
-    <div
-      class="background-flame-inner flame"
-      id="background-flame-inner"
-      v-bind:class="classObject"
-      :style="{ backgroundPositionY: `${this.pos + 24}vh` }"
-    >
-      <div
-        class="background-flame-inner2 flame"
-        id="background-flame-inner2"
-        v-bind:class="classObject"
-        :style="{ backgroundPositionY: `${this.pos + 48}vh` }"
-      >
-        <div
-          class="background-flame-inner3 flame"
-          id="background-flame-inner3"
-          v-bind:class="classObject"
-          :style="{ backgroundPositionY: `${this.pos + 72}vh` }"
-        ></div>
-      </div>
-    </div>
-  </div>
-</template>
-
-<script lang="ts">
+<script lang="tsx">
 import { Component, Vue } from 'vue-property-decorator';
 import { BankHistoryUnit } from '../types';
 
@@ -42,8 +12,17 @@ class Flame extends Vue {
   invisibleFlame = true;
   x = 12;
 
-  get classObject (): { fast: boolean; 'invisible-flame': boolean } {
-    return { fast: this.fast, 'invisible-flame': this.invisibleFlame };
+  get classObject (): {
+    fast: boolean;
+    'invisible-flame': boolean;
+    flame: boolean;
+    // eslint-disable-next-line
+  } {
+    return {
+      fast: this.fast,
+      'invisible-flame': this.invisibleFlame,
+      flame: true
+    };
   }
 
   get pos (): number {
@@ -70,6 +49,15 @@ class Flame extends Vue {
     }
     const pos = 90 - 90 * (intense / 100);
     return pos;
+  }
+
+  get styleArray () {
+    return [
+      { backgroundPositionY: `${this.pos}vh` },
+      { backgroundPositionY: `${this.pos + 24}vh` },
+      { backgroundPositionY: `${this.pos + 48}vh` },
+      { backgroundPositionY: `${this.pos + 72}vh` }
+    ];
   }
 
   get bankHistory (): BankHistoryUnit[] {
@@ -122,6 +110,34 @@ class Flame extends Vue {
       }
     }
   }
+
+  render () {
+    return (
+      <div
+        id='background-flame'
+        class={this.classObject}
+        style={this.styleArray[0]}
+      >
+        <div
+          id='background-flame-inner'
+          class={this.classObject}
+          style={this.styleArray[1]}
+        >
+          <div
+            id='background-flame-inner2'
+            class={this.classObject}
+            style={this.styleArray[2]}
+          >
+            <div
+              id='background-flame-inner3'
+              class={this.classObject}
+              style={this.styleArray[3]}
+            ></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 }
 export default Flame;
 </script>
@@ -147,21 +163,17 @@ export default Flame;
   transition-duration: 5s;
   transition-timing-function: linear;
 }
-.background-flame {
+#background-flame {
   z-index: 1;
   background-position-x: 0vh;
-  background-position-y: 90vh;
 }
-.background-flame-inner {
+#background-flame-inner {
   background-position-x: 15vh;
-  background-position-y: 140vh;
 }
-.background-flame-inner2 {
+#background-flame-inner2 {
   background-position-x: 30vh;
-  background-position-y: 190vh;
 }
-.background-flame-inner3 {
+#background-flame-inner3 {
   background-position-x: 45vh;
-  background-position-y: 240vh;
 }
 </style>

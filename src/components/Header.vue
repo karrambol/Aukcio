@@ -1,42 +1,25 @@
-<template>
-  <header :style="{ background: bgGradient }">
-    <div></div>
-    <div>
-      <h1><span>Помойный </span>аукцион</h1>
-    </div>
-    <div>
-      <ul>
-        <li v-if="this.$store.getters.getAuth">
-          <h2>ID: {{ this.$store.getters.getId }}</h2>
-        </li>
-        <li v-if="this.$store.getters.getAuth">
-          <a v-on:click="sendNotification"><font-awesome-icon icon="bell"/></a>
-        </li>
-        <!--<li><router-link><font-awesome-icon icon="cog" /></router-link></li>-->
-        <li v-if="!this.$store.getters.getAuth">
-          <a href="/login/discord"><font-awesome-icon icon="sign-in-alt"/></a>
-        </li>
-        <li v-if="this.$store.getters.getAuth">
-          <a href="/logout"><font-awesome-icon icon="sign-out-alt"/></a>
-        </li>
-      </ul>
-    </div>
-  </header>
-</template>
-<script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+<script lang="tsx">
+import { Component } from 'vue-property-decorator';
+import * as tsx from 'vue-tsx-support';
+
+interface HeaderProps {
+  bloodyLevel: number;
+}
 
 @Component({
   props: {
     bloodyLevel: { type: Number, default: 0 }
   }
 })
-class Header extends Vue {
+class Header extends tsx.Component<HeaderProps> {
   bloodyLevel: number = 0;
-  get bgGradient (): string {
-    return `linear-gradient(180deg, rgba(100,9,9,1)
+
+  get bgGradient (): { background: string } {
+    return {
+      background: `linear-gradient(180deg, rgba(100,9,9,1)
         ${(this.bloodyLevel / 3.5) * 100}%,
-        #2e2e2e ${(this.bloodyLevel / 2.5) * 100}%) !important`;
+        #2e2e2e ${(this.bloodyLevel / 2.5) * 100}%) !important`
+    };
   }
 
   created () {
@@ -46,6 +29,46 @@ class Header extends Vue {
 
   sendNotification () {
     this.$store.dispatch('sendNotification').then();
+  }
+
+  render () {
+    return (
+      <header style={this.bgGradient}>
+        <div></div>
+        <div>
+          <h1>
+            <span>Помойный </span>аукцион
+          </h1>
+        </div>
+        <div>
+          {this.$store.getters.getAuth ? (
+            <ul>
+              <li>
+                <h2>ID: {this.$store.getters.getId}</h2>
+              </li>
+              <li>
+                <a on-click={this.sendNotification}>
+                  <font-awesome-icon icon='bell' />
+                </a>
+              </li>
+              <li>
+                <a href='/logout'>
+                  <font-awesome-icon icon='sign-out-alt' />
+                </a>
+              </li>
+            </ul>
+          ) : (
+            <ul>
+              <li>
+                <a href='/login/discord'>
+                  <font-awesome-icon icon='sign-in-alt' />
+                </a>
+              </li>
+            </ul>
+          )}
+        </div>
+      </header>
+    );
   }
 }
 export default Header;

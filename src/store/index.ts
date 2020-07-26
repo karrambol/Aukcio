@@ -5,14 +5,14 @@ import { TableData } from './modules/TableData';
 import { Auth } from './modules/auth';
 
 Vue.use(Vuex);
-const root = new Module({
+export const rootModule = new Module({
   modules: {
     Auth,
     TableData
   }
 });
-export const store = createStore(
-  root,
+const store = createStore(
+  rootModule,
 
   {
     strict: process.env.NODE_ENV !== 'production'

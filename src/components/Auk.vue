@@ -1,18 +1,4 @@
-<template>
-  <div class="main">
-    <Header v-bind:bloody-level="bloodyLevel" />
-    <div class="auk-row">
-      <AukTable v-on:bloody="bloodyHandler" />
-      <div class="right-col">
-        <Timer />
-        <p>Сделано с любовью <span>♥️</span></p>
-      </div>
-      <Flame v-if="flameOn" />
-    </div>
-  </div>
-</template>
-
-<script lang="ts">
+<script lang="tsx">
 import Header from './Header.vue';
 import Timer from './Timer.vue';
 import AukTable from './AukTable.vue';
@@ -67,6 +53,24 @@ class Auk extends Vue {
         if (this.bloodyLevel > 0) this.bloodySub();
       }, 5 * 60 * 1000);
     }
+  }
+
+  render () {
+    return (
+      <div class='main'>
+        <Header bloody-level={this.bloodyLevel} />
+        <div class='auk-row'>
+          <AukTable on-bloody={this.bloodyHandler} />
+          <div class='right-col'>
+            <Timer />
+            <p>
+              Сделано с любовью <span>♥️</span>
+            </p>
+          </div>
+          {this.flameOn ? <Flame /> : ''}
+        </div>
+      </div>
+    );
   }
 }
 
