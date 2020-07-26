@@ -84,7 +84,6 @@ header {
   width: 100%;
   height: 50px;
   color: #fff;
-  /* background-color: #2e2e2e; */
   background: linear-gradient(180deg, rgb(95, 0, 0) 0%, rgba(2, 0, 36, 1) 0%);
 }
 h1 {

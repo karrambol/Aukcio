@@ -3,7 +3,6 @@
     "target": "esnext",
     "module": "esnext",
     "strict": true,
-    // "strictPropertyInitialization": false,
     "jsx": "preserve",
     "jsxFactory": "VueTsxSupport",
     "importHelpers": true,

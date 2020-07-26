@@ -187,19 +187,11 @@ export default Timer;
 
 <style scoped>
 .timer-row {
-  /* flex-grow: 1;
-    flex-shrink: 1;
-    align-self: stretch; */
   width: 400px;
   color: #fff;
   padding: 0 20px;
   z-index: 100;
 }
-/* @media screen and (max-width:600px) {
-    .timer-row {
-      max-width: 100vw;
-    }
-  } */
 .timer-container {
   flex-grow: 1;
   flex-shrink: 1;
@@ -219,14 +211,12 @@ button {
   height: 35px;
   width: 85px;
   font-size: 20px;
-  /* border: 3px solid #343a40; */
   border-radius: 5px;
   color: white;
   background-color: #343a40;
 }
 .timer-button:hover {
   background-color: black;
-  /* box-shadow: none; */
   color: white;
 }
 .timer-line {
@@ -266,8 +256,6 @@ button {
 .time {
   display: inline-block;
   font-size: 76px;
-  /* text-shadow: 5px 3px 0 black; */
-  /* font-family: 'Roboto', sans-serif; */
 }
 .time span {
   font-size: 48px;

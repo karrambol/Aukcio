@@ -210,7 +210,6 @@ export default AukTable;
   font-size: 30px;
   vertical-align: sub;
 }
-
 p {
   margin-block-start: 0;
   margin-block-end: 0;
@@ -326,7 +325,6 @@ button:hover {
   height: 32px;
   width: calc(100% - 15px - 37px);
 }
-
 .lot-table input.damaged-price {
   background-color: rgb(168, 66, 168);
   border-color: rgb(168, 66, 168);
