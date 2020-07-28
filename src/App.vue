@@ -1,13 +1,4 @@
-<template>
-  <div id="app" :style="appStyle">
-    <p id="amount" v-bind:class="{ visible: getAmountVisible }">666</p>
-    <div class="wrapper">
-      <router-view v-on:bloody="bloodyHandler" v-on:add="addHandler" />
-    </div>
-  </div>
-</template>
-
-<script lang="ts">
+<script lang="tsx">
 import { Component, Vue } from 'vue-property-decorator';
 
 @Component
@@ -44,6 +35,10 @@ class App extends Vue {
     };
   }
 
+  get amountClassObject () {
+    return { visible: this.getAmountVisible };
+  }
+
   bloodyHandler (bloodyLevel: number) {
     if (bloodyLevel >= 3 && this.timeoutID === 0) {
       this.isBloody = true;
@@ -74,6 +69,19 @@ class App extends Vue {
         set(false);
       }, 500);
     }
+  }
+
+  render () {
+    return (
+      <div id='app' style={this.appStyle}>
+        <p id='amount' class={this.amountClassObject}>
+          666
+        </p>
+        <div class='wrapper'>
+          <router-view onBloody={this.bloodyHandler} onAdd={this.addHandler} />
+        </div>
+      </div>
+    );
   }
 }
 export default App;
