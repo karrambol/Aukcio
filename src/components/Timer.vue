@@ -152,9 +152,25 @@ class Timer extends Vue {
               </button>
             )}
             <div class='time-container'>
-              <div class='time'>
-                {this.minutes}:{this.seconds}
-                <span>.{this.milliseconds}</span>
+              <div
+                class={{
+                  time: true,
+                  flick:
+                    this.isGoing &&
+                    this.currentTime < 11000 &&
+                    this.currentTime % 1000 < 400
+                }}
+              >
+                {this.minutes}
+                <span
+                  class={{
+                    flick: this.isGoing && this.currentTime % 1000 < 400
+                  }}
+                >
+                  :
+                </span>
+                {this.seconds}
+                <span class='miliseconds'>.{this.milliseconds}</span>
               </div>
             </div>
             <button onClick={this.clear} class='button-clear'>
@@ -256,9 +272,17 @@ button {
 .time {
   display: inline-block;
   font-size: 76px;
+  transition: 100ms;
+  opacity: 1;
 }
-.time span {
+.time.flick {
+  opacity: 0;
+}
+.time .miliseconds {
   font-size: 48px;
+}
+.time span.flick {
+  opacity: 0;
 }
 .wasted {
   color: black;
