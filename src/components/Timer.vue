@@ -162,13 +162,7 @@ class Timer extends Vue {
                 }}
               >
                 {this.minutes}
-                <span
-                  class={{
-                    flick: this.isGoing && this.currentTime % 1000 < 400
-                  }}
-                >
-                  :
-                </span>
+                <span>:</span>
                 {this.seconds}
                 <span class='miliseconds'>.{this.milliseconds}</span>
               </div>
