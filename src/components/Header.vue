@@ -21,7 +21,7 @@ class Header extends tsx.Component<HeaderProps> {
     return {
       background: `linear-gradient(180deg, rgba(100,9,9,1)
         ${(this.bloodyLevel / 3.5) * 100}%,
-        #2e2e2e ${(this.bloodyLevel / 2.5) * 100}%) !important`
+        var(--header-background) ${(this.bloodyLevel / 2.5) * 100}%) !important`
     };
   }
 
@@ -83,8 +83,8 @@ header {
   justify-content: space-between;
   width: 100%;
   height: 50px;
-  color: #fff;
-  background: linear-gradient(180deg, rgb(95, 0, 0) 0%, rgba(2, 0, 36, 1) 0%);
+  color: var(--header-text);
+  background: linear-gradient(180deg, #5f0000 0%, var(--header-background) 0%);
 }
 h1 {
   font-size: 32px;
@@ -92,7 +92,7 @@ h1 {
   text-transform: uppercase;
 }
 h1 span {
-  color: #657b83;
+  color: var(--header-text-accent);
 }
 h1 img {
   margin-left: 10px;
@@ -120,13 +120,13 @@ ul li {
 ul li a {
   display: block;
   cursor: pointer;
-  color: #fff;
+  color: var(--header-text);
   text-decoration: none;
   padding: 0.8rem 14px;
 }
 ul li a:hover {
-  background-color: #fff;
-  color: black;
+  background-color: var(--header-text);
+  color: var(--header-background);
 }
 h2 {
   display: block;

@@ -204,7 +204,7 @@ export default Timer;
 <style scoped>
 .timer-row {
   width: 400px;
-  color: #fff;
+  color: var(--main-text);
   padding: 0 20px;
   z-index: 100;
 }
@@ -228,12 +228,11 @@ button {
   width: 85px;
   font-size: 20px;
   border-radius: 5px;
-  color: white;
-  background-color: #343a40;
+  color: var(--main-buttons-text);
+  background-color: var(--main-buttons-background);
 }
 .timer-button:hover {
-  background-color: black;
-  color: white;
+  background-color: var(--main-buttons-background-hover);
 }
 .timer-line {
   font-size: 20px;
@@ -281,11 +280,8 @@ button {
 .time .miliseconds {
   font-size: 48px;
 }
-.time span.flick {
-  opacity: 0;
-}
 .wasted {
-  color: black;
+  color: var(--main-text-accent);
   text-align: end;
   padding: 1rem 0;
   padding-bottom: 0px;

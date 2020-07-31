@@ -131,6 +131,7 @@ p {
   text-align: end;
   padding: 0 10px;
   margin: 0;
+  color: var(--main-text-accent);
 }
 p span {
   vertical-align: sub;

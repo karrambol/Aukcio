@@ -8,6 +8,50 @@ class App extends Vue {
   isBloody = false;
   timeoutID = 0;
   amountVisible = false;
+  currentTheme = 'classic';
+  colorThemes: { [key: string]: { [key: string]: string } } = {
+    classic: {
+      '--main': '#009688',
+      '--header-background': '#2e2e2e',
+      '--header-text': '#fff',
+      '--header-text-accent': '#657b83',
+      '--main-text': '#fff',
+      '--main-text-accent': '#000',
+      '--main-inputs-background': '#d8d8d8',
+      '--main-inputs-background-focus': '#fff',
+      '--main-inputs-text': '#000',
+      '--main-buttons-background': '#343a40',
+      '--main-buttons-background-hover': '#000',
+      '--main-buttons-text': '#fff'
+    },
+    dark: {
+      '--main': '#023846',
+      '--background': '',
+      '--header-background': '#073642',
+      '--header-text': '#839496',
+      '--header-text-accent': '#000000',
+      '--main-text': '#ccc',
+      '--main-text-accent': '#839496',
+      '--main-inputs-background': '#999',
+      '--main-inputs-background-focus': '#ccc',
+      '--main-inputs-text': '#000',
+      '--main-buttons-background': '#999',
+      '--main-buttons-background-hover': '#ccc',
+      '--main-buttons-text': '#000'
+    }
+  };
+
+  get appStyle () {
+    return {
+      ...this.colorThemes[this.currentTheme],
+      ...{
+        '--bgc': this.isBloody
+          ? this.bloodyColor
+          : this.colorThemes[this.currentTheme]['--main']
+      }
+    };
+  }
+
   daemonVoice = (function () {
     const audio = new Audio();
     audio.src = require('./assets/audio/daemon_voice.mp3');
@@ -18,12 +62,6 @@ class App extends Vue {
 
   get getAmountVisible () {
     return this.amountVisible;
-  }
-
-  get appStyle () {
-    return {
-      '--bgc': this.isBloody ? this.bloodyColor : this.mainColor
-    };
   }
 
   get background () {
@@ -91,7 +129,7 @@ export default App;
 #amount {
   position: absolute;
   font-size: 250px;
-  color: black;
+  color: var(--main-text-accent);
   z-index: 150;
   line-height: 100%;
   margin-left: calc(50% - 150px);

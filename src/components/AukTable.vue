@@ -257,9 +257,9 @@ p {
 }
 input {
   height: 100%;
-  background-color: #d8d8d8;
+  background-color: var(--main-inputs-background);
   border: 3px solid #343a40;
-  color: black;
+  color: var(--main-inputs-text);
   font-size: 36px;
   font-weight: 500;
   border-radius: 7px;
@@ -269,7 +269,7 @@ input {
 }
 input:focus {
   border: 3px solid #448aff;
-  background-color: white;
+  background-color: var(--main-inputs-background-focus);
 }
 .lot-table :nth-child(1) input {
   background-color: gold;
@@ -290,7 +290,7 @@ input:focus {
 }
 .lot-table :nth-child(2) input:focus {
   border: 3px outset #448aff;
-  box-shadow: 0 0 50px #bdbdbd, 3px 3px 0 black;
+  box-shadow: 0 0 10px #bdbdbd, 3px 3px 0 black;
 }
 button {
   width: 41px;
@@ -299,15 +299,15 @@ button {
   font-weight: bold;
   line-height: 1;
   flex-shrink: 0;
-  background-color: #343a40;
-  color: #fff;
+  background-color: var(--main-buttons-background);
+  color: var(--main-buttons-text);
   border-radius: 5px;
   border: none;
   border-radius: 50%;
 }
 button:hover {
-  background-color: black;
-  color: #fff;
+  background-color: var(--main-buttons-background-hover);
+  color: var(--main-buttons-text);
 }
 .add-row-button-container {
   display: flex;
